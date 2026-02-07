@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cymoify Collectionz - Modern Wear Uganda</title>
+    
+    <!-- Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+    
+    <!-- Iconify -->
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                fontFamily: {
+                    sans: ['Inter', 'sans-serif'],
+                },
+                extend: {
+                    colors: {
+                        brand: {
+                            500: '#6366f1', 
+                            600: '#4f46e5',
+                            400: '#818cf8', 
+                        },
+                        zinc: {
+                            850: '#1f1f22',
+                            900: '#18181b',
+                            950: '#09090b', 
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-out forwards',
+                        'slide-up': 'slideUp 0.5s ease-out forwards',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        html { scroll-behavior: smooth; }
+        
+        /* Loading spinner */
+        .loader {
+            border-top-color: #6366f1;
+            -webkit-animation: spinner 1.5s linear infinite;
+            animation: spinner 1.5s linear infinite;
+        }
+        @keyframes spinner {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 antialiased transition-colors duration-300 selection:bg-brand-500 selection:text-white relative">
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-white/90 dark:bg-zinc-950/90 backdrop-blur-md border-b border-zinc-200 dark:border-zinc-800 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+            <!-- Mobile Menu Button -->
+            <button class="md:hidden p-2 -ml-2 text-zinc-600 dark:text-zinc-400" onclick="toggleMobileMenu()">
+                <iconify-icon icon="solar:hamburger-menu-linear" width="24" stroke-width="1.5"></iconify-icon>
+            </button>
+
+            <!-- Logo (MODIFIED: clickable, reinforced) -->
+            <a href="#" onclick="switchPage('home')" class="text-xl font-bold tracking-tighter uppercase z-50 relative text-brand-600 dark:text-brand-400">
+                Cymoify
+            </a>
+
+            <!-- Desktop Links -->
+            <div class="hidden md:flex items-center space-x-8 text-sm font-medium text-zinc-500 dark:text-zinc-400">
+                <button onclick="switchPage('home')" class="hover:text-brand-600 dark:hover:text-brand-400 transition-colors">Home</button>
+                <button onclick="switchPage('men')" class="hover:text-brand-600 dark:hover:text-brand-400 transition-colors">Men</button>
+                <button onclick="switchPage('women')" class="hover:text-brand-600 dark:hover:text-brand-400 transition-colors">Women</button>
+                <button onclick="switchPage('accessories')" class="hover:text-brand-600 dark:hover:text-brand-400 transition-colors">Accessories</button>
+                <button onclick="switchPage('about')" class="hover:text-brand-600 dark:hover:text-brand-400 transition-colors">About</button>
+            </div>
+
+            <!-- Icons & Toggles -->
+            <div class="flex items-center space-x-4">
+                <button onclick="toggleSearch()" class="p-1 text-zinc-600 dark:text-zinc-400 hover:text-brand-600 dark:hover:text-brand-400 transition-transform hover:scale-105">
+                    <iconify-icon icon="solar:magnifer-linear" width="22" stroke-width="1.5"></iconify-icon>
+                </button>
+                
+                <button onclick="toggleTheme()" class="p-1 text-zinc-600 dark:text-zinc-400 hover:text-brand-600 dark:hover:text-brand-400 transition-transform hover:scale-105">
+                    <iconify-icon id="theme-icon" icon="solar:moon-linear" width="22" stroke-width="1.5"></iconify-icon>
+                </button>
+
+                <!-- ADDED: Cart Icon (replaces bag icon) -->
+                <div class="relative group">
+                    <button onclick="switchPage('cart')" class="p-1 text-zinc-600 dark:text-zinc-400 hover:text-brand-600 dark:hover:text-brand-400 transition-transform hover:scale-105">
+                        <iconify-icon icon="solar:cart-large-2-linear" width="22" stroke-width="1.5"></iconify-icon>
+                    </button>
+                    <!-- ADDED: cart count badge -->
+                    <span id="cart-count-badge" class="hidden absolute -top-2 -right-2 text-[10px] bg-brand-500 text-white rounded-full px-1">0</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu Overlay -->
+    <div id="mobile-menu" class="fixed inset-0 bg-white dark:bg-zinc-950 z-40 transform -translate-x-full transition-transform duration-500 flex flex-col justify-center items-center space-y-8 md:hidden">
+        <button onclick="switchPage('home'); toggleMobileMenu()" class="text-3xl font-light tracking-tight hover:text-brand-600 dark:text-white dark:hover:text-brand-400">Home</button>
+        <button onclick="switchPage('men'); toggleMobileMenu()" class="text-3xl font-light tracking-tight hover:text-brand-600 dark:text-white dark:hover:text-brand-400">Men</button>
+        <button onclick="switchPage('women'); toggleMobileMenu()" class="text-3xl font-light tracking-tight hover:text-brand-600 dark:text-white dark:hover:text-brand-400">Women</button>
+        <button onclick="switchPage('accessories'); toggleMobileMenu()" class="text-3xl font-light tracking-tight hover:text-brand-600 dark:text-white dark:hover:text-brand-400">Accessories</button>
+        <button onclick="switchPage('about'); toggleMobileMenu()" class="text-3xl font-light tracking-tight hover:text-brand-600 dark:text-white dark:hover:text-brand-400">About Us</button>
+        
+        <button class="absolute top-5 right-6 text-zinc-500 hover:text-brand-600" onclick="toggleMobileMenu()">
+            <iconify-icon icon="solar:close-circle-linear" width="32" stroke-width="1.5"></iconify-icon>
+        </button>
+    </div>
+
+    <!-- Search Overlay -->
+    <div id="search-overlay" class="fixed inset-0 bg-white/95 dark:bg-zinc-950/95 backdrop-blur-xl z-[60] hidden opacity-0 transition-opacity duration-300">
+        <div class="max-w-3xl mx-auto px-6 pt-32 h-full flex flex-col">
+            <div class="flex items-center justify-between mb-8 border-b border-zinc-200 dark:border-zinc-800 pb-4">
+                <div class="flex items-center flex-1">
+                    <iconify-icon icon="solar:magnifer-linear" width="24" class="text-zinc-400 mr-4"></iconify-icon>
+                    <input type="text" id="search-input" placeholder="Search products..." class="w-full bg-transparent text-xl md:text-2xl outline-none text-zinc-900 dark:text-white placeholder-zinc-400" oninput="handleSearch()">
+                </div>
+                <button onclick="toggleSearch()" class="ml-4 text-zinc-400 hover:text-brand-600">
+                    <iconify-icon icon="solar:close-circle-linear" width="32"></iconify-icon>
+                </button>
+            </div>
+            <div id="search-results" class="grid grid-cols-1 md:grid-cols-2 gap-4 overflow-y-auto pb-10">
+                <!-- Search Results -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Modal (Popup) -->
+    <div id="product-modal" class="fixed inset-0 z-[100] hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-zinc-900 w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden relative flex flex-col md:flex-row max-h-[90vh] md:max-h-[600px] animate-slide-up">
+            
+            <!-- CLOSE BUTTON: Prominent X -->
+            <button onclick="closeModal()" class="absolute top-4 right-4 z-[110] bg-white text-zinc-900 p-2 rounded-full shadow-lg hover:bg-zinc-200 hover:scale-105 transition-all duration-200 cursor-pointer flex items-center justify-center group border border-zinc-100">
+                <iconify-icon icon="solar:close-circle-bold" width="28" class="group-hover:text-red-500 transition-colors"></iconify-icon>
+            </button>
+            
+            <!-- Modal Image -->
+            <div class="w-full md:w-1/2 h-64 md:h-auto bg-zinc-100 dark:bg-zinc-800 relative">
+                <img id="modal-img" src="" class="w-full h-full object-cover" alt="Product">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent md:hidden"></div>
+            </div>
+            
+            <!-- Modal Content -->
+            <div class="w-full md:w-1/2 p-8 flex flex-col justify-between overflow-y-auto bg-white dark:bg-zinc-900 relative">
+                <div>
+                    <div class="flex justify-between items-start mb-2 pr-8">
+                        <span class="inline-block px-2 py-1 bg-brand-100 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 text-[10px] font-bold uppercase tracking-wider rounded mb-2" id="modal-category">Category</span>
+                    </div>
+                    <h2 id="modal-title" class="text-2xl md:text-3xl font-bold text-zinc-900 dark:text-white mb-2 leading-tight"></h2>
+                    <p id="modal-price" class="text-xl font-medium text-brand-600 dark:text-brand-400 mb-6"></p>
+                    
+                    <div class="space-y-4 mb-8">
+                        <details class="group" open="">
+                            <summary class="flex justify-between items-center font-medium cursor-pointer list-none text-sm text-zinc-900 dark:text-white">
+                                <span>Description</span>
+                                <span class="transition group-open:rotate-180">
+                                    <iconify-icon icon="solar:alt-arrow-down-linear"></iconify-icon>
+                                </span>
+                            </summary>
+                            <div class="text-zinc-500 dark:text-zinc-400 text-sm mt-3 group-open:animate-fade-in leading-relaxed" id="modal-description">
+                                Expertly crafted for the modern individual in Uganda. This piece combines sustainable materials with a timeless silhouette.
+                            </div>
+                        </details>
+                        <div class="border-t border-zinc-100 dark:border-zinc-800"></div>
+                        <details class="group">
+                            <summary class="flex justify-between items-center font-medium cursor-pointer list-none text-sm text-zinc-900 dark:text-white">
+                                <span>Size &amp; Fit</span>
+                                <span class="transition group-open:rotate-180">
+                                    <iconify-icon icon="solar:alt-arrow-down-linear"></iconify-icon>
+                                </span>
+                            </summary>
+                            <div class="text-zinc-500 dark:text-zinc-400 text-sm mt-3 group-open:animate-fade-in">
+                                True to size. Standard fit.
+                            </div>
+                        </details>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <a id="modal-whatsapp-btn" href="#" target="_blank" class="w-full bg-green-600 hover:bg-green-500 text-white py-4 rounded-xl font-medium flex items-center justify-center space-x-2 transition-all transform active:scale-95 shadow-lg shadow-green-500/20">
+                        <iconify-icon icon="solar:chat-round-dots-linear" width="22"></iconify-icon>
+                        <span>Order on WhatsApp</span>
+                    </a>
+
+                    <!-- ADDED: Add to Cart in Modal -->
+                    <button id="modal-add-btn" onclick="event.stopPropagation(); modalAddToCart()" class="w-full border border-zinc-200 dark:border-zinc-800 py-3 rounded-xl font-medium">
+                        Add to Cart
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN PAGE CONTENT (Dynamic) -->
+    <main id="app-content" class="pt-0"> <!-- Removed padding top as Hero is full screen now -->
+        
+        <!-- SECTION: HOME -->
+        <div id="home-page" class="page-section">
+            <!-- Hero Section (Modified: Image Behind Text) -->
+            <header class="relative h-screen min-h-[600px] w-full flex items-center justify-center overflow-hidden">
+                <!-- ADDED/MODIFIED Background Image: darker-skinned model with scroll fade -->
+                <img id="hero-bg" src="https://images.unsplash.com/photo-1600180758890-6b94519a8ba6?q=80&amp;w=2000&amp;auto=format&amp;fit=crop" class="absolute inset-0 w-full h-full object-cover animate-fade-in" alt="Hero Background">
+                
+                <!-- Overlay Gradient -->
+                <div id="hero-gradient" class="absolute inset-0 bg-black/50 dark:bg-black/70"></div>
+                
+                <!-- Content Centered -->
+                <div class="relative z-10 text-center px-6 max-w-4xl animate-slide-up space-y-6">
+                    <span class="inline-block py-1 px-3 border border-white/30 rounded-full text-white font-semibold tracking-wide text-xs uppercase backdrop-blur-md">
+                        New Season Drop
+                    </span>
+                    <h1 class="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight text-white leading-none">
+                        Kampala <br>
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-white">Aesthetics.</span>
+                    </h1>
+                    <p class="text-lg md:text-xl text-zinc-200 font-light max-w-lg mx-auto leading-relaxed">
+                        Elevate your everyday style. The finest selection of minimal wear delivered across Uganda.
+                    </p>
+                    <div class="flex flex-col sm:flex-row justify-center gap-4 pt-6">
+                        <button onclick="scrollToGrid()" class="px-8 py-4 bg-white text-black rounded-full font-bold hover:bg-zinc-200 transition-colors">
+                            Shop Collection
+                        </button>
+                        <button onclick="switchPage('about')" class="px-8 py-4 border border-white/50 text-white rounded-full font-bold hover:bg-white/10 backdrop-blur-sm transition-colors">
+                            Learn More
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Trending Section (Horizontal Scroll) -->
+            <section class="py-16 border-b border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-950">
+                <div class="max-w-7xl mx-auto px-6 mb-8 flex items-end justify-between">
+                    <div>
+                        <h2 class="text-2xl font-bold text-zinc-900 dark:text-white">Trending in Uganda</h2>
+                        <p class="text-zinc-500 dark:text-zinc-400 text-sm mt-1">Hottest picks in Kampala this week.</p>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button class="p-2 border border-zinc-200 dark:border-zinc-700 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800" onclick="scrollTrending('left')">
+                            <iconify-icon icon="solar:arrow-left-linear"></iconify-icon>
+                        </button>
+                        <button class="p-2 border border-zinc-200 dark:border-zinc-700 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800" onclick="scrollTrending('right')">
+                            <iconify-icon icon="solar:arrow-right-linear"></iconify-icon>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Flowing Catalogue Container -->
+                <div id="trending-container" class="flex overflow-x-auto space-x-6 px-6 pb-8 no-scrollbar snap-x snap-mandatory">
+                    <!-- Populated by JS -->
+                </div>
+            </section>
+
+            <!-- General Products Grid -->
+            <section id="shop-grid" class="py-20 px-6 min-h-screen bg-white dark:bg-zinc-950">
+                <div class="max-w-7xl mx-auto">
+                    <div class="flex items-center justify-between mb-10">
+                        <h2 class="text-2xl font-bold text-zinc-900 dark:text-white">All Products</h2>
+                        <!-- Simple Filter -->
+                        <div class="flex space-x-2">
+                             <button onclick="filterHome('all')" class="text-xs font-medium px-3 py-1 rounded-full bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 transition">All</button>
+                             <button onclick="filterHome('men')" class="text-xs font-medium px-3 py-1 rounded-full text-zinc-500 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800 transition">Men</button>
+                             <button onclick="filterHome('women')" class="text-xs font-medium px-3 py-1 rounded-full text-zinc-500 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800 transition">Women</button>
+                        </div>
+                    </div>
+
+                    <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-10">
+                        <!-- Populated by JS -->
+                    </div>
+
+                    <!-- Load More -->
+                    <div class="flex justify-center mt-20">
+                        <button id="load-more-btn" onclick="loadMoreProducts()" class="group flex items-center space-x-2 px-8 py-3 bg-zinc-100 dark:bg-zinc-800 hover:bg-brand-600 hover:text-white dark:hover:bg-brand-600 transition-all rounded-full">
+                            <span class="text-xs font-bold uppercase tracking-widest">Load More</span>
+                            <iconify-icon icon="solar:restart-linear" width="18" class="group-hover:rotate-180 transition-transform duration-500"></iconify-icon>
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- SECTION: MEN -->
+        <div id="men-page" class="page-section hidden pt-24 bg-white dark:bg-zinc-950 min-h-screen">
+            <div class="max-w-7xl mx-auto px-6">
+                <h1 class="text-4xl font-bold mb-2 dark:text-white">Men's Collection</h1>
+                <p class="text-zinc-500 mb-12">Architecture for the body.</p>
+                <div id="men-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pb-20"></div>
+            </div>
+        </div>
+
+        <!-- SECTION: WOMEN -->
+        <div id="women-page" class="page-section hidden pt-24 bg-white dark:bg-zinc-950 min-h-screen">
+            <div class="max-w-7xl mx-auto px-6">
+                <h1 class="text-4xl font-bold mb-2 dark:text-white">Women's Collection</h1>
+                <p class="text-zinc-500 mb-12">Elegance in every stitch.</p>
+                <div id="women-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pb-20"></div>
+            </div>
+        </div>
+
+        <!-- SECTION: ACCESSORIES -->
+        <div id="accessories-page" class="page-section hidden pt-24 bg-white dark:bg-zinc-950 min-h-screen">
+            <div class="max-w-7xl mx-auto px-6">
+                <h1 class="text-4xl font-bold mb-2 dark:text-white">Accessories</h1>
+                <p class="text-zinc-500 mb-12">The finishing touches.</p>
+                <div id="acc-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pb-20"></div>
+            </div>
+        </div>
+
+        <!-- SECTION: ABOUT -->
+        <div id="about-page" class="page-section hidden pt-24 pb-20 bg-white dark:bg-zinc-950 min-h-screen">
+            <div class="max-w-7xl mx-auto px-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+                    <div>
+                        <span class="text-brand-600 font-bold tracking-widest uppercase text-xs">Who We Are</span>
+                        <h1 class="text-4xl md:text-5xl font-bold mt-4 mb-6 dark:text-white">Redefining Retail in Uganda.</h1>
+                        <!-- MODIFIED: Company name to Cymoify Collectionz -->
+                        <p class="text-lg text-zinc-500 dark:text-zinc-400 mb-6 leading-relaxed">
+                            Cymoify Collectionz isn't just a store; it's a curated experience. We source the finest minimal aesthetic wear and deliver it directly to you in Kampala and beyond.
+                        </p>
+                        
+                        <div class="space-y-6">
+                            <div class="flex items-start space-x-4">
+                                <div class="p-3 bg-brand-100 dark:bg-brand-900/30 rounded-lg text-brand-600 dark:text-brand-400">
+                                    <iconify-icon icon="solar:box-minimalistic-linear" width="24"></iconify-icon>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-zinc-900 dark:text-white">Premium Sourcing</h3>
+                                    <p class="text-sm text-zinc-500 mt-1">Handpicked quality items.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start space-x-4">
+                                <div class="p-3 bg-brand-100 dark:bg-brand-900/30 rounded-lg text-brand-600 dark:text-brand-400">
+                                    <iconify-icon icon="solar:phone-calling-linear" width="24"></iconify-icon>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-zinc-900 dark:text-white">Easy Ordering</h3>
+                                    <p class="text-sm text-zinc-500 mt-1">Seamless purchase process via WhatsApp.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="relative h-[600px] bg-zinc-100 dark:bg-zinc-800 rounded-2xl overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1556905055-8f358a7a47b2?q=80&amp;w=1000&amp;auto=format&amp;fit=crop" class="absolute inset-0 w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                        <div class="absolute bottom-8 left-8 text-white">
+                            <p class="text-2xl font-bold">Est. 2024</p>
+                            <p class="opacity-80">Kampala, Uganda</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-zinc-50 dark:bg-zinc-950 border-t border-zinc-200 dark:border-zinc-800 pt-16 pb-8 px-6">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center text-xs text-zinc-400">
+            <p>© 2024 Cymoify Collectionz. All rights reserved.</p>
+            <div class="flex items-center space-x-2 mt-4 md:mt-0">
+                <span class="w-2 h-2 rounded-full bg-brand-500 animate-pulse"></span>
+                <span>Active &amp; Online</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- LOGIC SCRIPT -->
+    <script>
+        // --- DATA ---
+        // Converted prices to UGX (Approximate)
+        const products = [
+            { id: 1, name: "Oxford Structure Coat", price: 680000, category: "men", img: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?q=80&w=600&auto=format&fit=crop", trending: true },
+            { id: 2, name: "Essential Leather Low", price: 450000, category: "accessories", img: "https://images.unsplash.com/photo-1549298916-b41d501d3772?q=80&w=600&auto=format&fit=crop", trending: true },
+            { id: 3, name: "Pleated Linen Trousers", price: 350000, category: "women", img: "https://images.unsplash.com/photo-1509631179647-0177331693ae?q=80&w=600&auto=format&fit=crop", trending: false },
+            { id: 4, name: "Oversized Poplin Shirt", price: 320000, category: "women", img: "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?q=80&w=600&auto=format&fit=crop", trending: true },
+            { id: 5, name: "Merino Wool Trench", price: 890000, category: "men", img: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=600&auto=format&fit=crop", trending: false },
+            { id: 6, name: "Silk Blend Scarf", price: 170000, category: "accessories", img: "https://images.unsplash.com/photo-1584030373081-f37b7bb4fa8e?q=80&w=600&auto=format&fit=crop", trending: true },
+            { id: 7, name: "Urban Cargo Jacket", price: 560000, category: "men", img: "https://images.unsplash.com/photo-1487222477894-8943e31ef7b2?q=80&w=600&auto=format&fit=crop", trending: false },
+            { id: 8, name: "Minimalist Watch", price: 750000, category: "accessories", img: "https://images.unsplash.com/photo-1524592094714-0f0654e20314?q=80&w=600&auto=format&fit=crop", trending: true },
+            { id: 9, name: "Summer Knit Polo", price: 260000, category: "men", img: "https://images.unsplash.com/photo-1617137968427-85924c800a22?q=80&w=600&auto=format&fit=crop", trending: false },
+            { id: 10, name: "Flowing Midi Dress", price: 420000, category: "women", img: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?q=80&w=600&auto=format&fit=crop", trending: false },
+            { id: 11, name: "Canvas Totebag", price: 210000, category: "accessories", img: "https://images.unsplash.com/photo-1544816155-12df9643f363?q=80&w=600&auto=format&fit=crop", trending: false },
+            { id: 12, name: "Slim Fit Chino", price: 245000, category: "men", img: "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?q=80&w=600&auto=format&fit=crop", trending: false },
+            { id: 13, name: "Cashmere Sweater", price: 750000, category: "women", img: "https://images.unsplash.com/photo-1576566588028-4147f3842f27?q=80&w=600&auto=format&fit=crop", trending: false },
+            { id: 14, name: "Leather Belt", price: 150000, category: "accessories", img: "https://images.unsplash.com/photo-1624222247344-550fb60583dc?q=80&w=600&auto=format&fit=crop", trending: false },
+            { id: 15, name: "Denim Jacket", price: 340000, category: "women", img: "https://images.unsplash.com/photo-1543087903-1ac2ec7aa8c5?q=80&w=600&auto=format&fit=crop", trending: false },
+            { id: 16, name: "Aviator Sunglasses", price: 490000, category: "accessories", img: "https://images.unsplash.com/photo-1511499767150-a48a237f0083?q=80&w=600&auto=format&fit=crop", trending: true },
+        ];
+
+        let displayCount = 4; // Initial display
+        let currentFilter = 'all';
+
+        // --- CART (ADDED) ---
+        // cartItems: array of { id, qty } referencing products by id
+        let cartItems = [];
+
+        function loadCartFromMemory() {
+            // intentionally left out persistence to avoid changing original behavior;
+            // if you want localStorage, we can enable it.
+            updateCartBadge();
+        }
+
+        function findCartItem(id) {
+            return cartItems.find(ci => ci.id === id);
+        }
+
+        function addToCart(id, qty = 1) {
+            const existing = findCartItem(id);
+            if (existing) {
+                existing.qty += qty;
+            } else {
+                cartItems.push({ id, qty });
+            }
+            updateCartBadge();
+        }
+
+        function modalAddToCart() {
+            const id = parseInt(document.getElementById('modal-add-btn').getAttribute('data-product-id'));
+            if (!isNaN(id)) {
+                addToCart(id, 1);
+                // small feedback: change text briefly
+                const btn = document.getElementById('modal-add-btn');
+                const original = btn.innerText;
+                btn.innerText = 'Added';
+                setTimeout(() => btn.innerText = original, 900);
+            }
+        }
+
+        function updateCartBadge() {
+            const badge = document.getElementById('cart-count-badge');
+            const totalCount = cartItems.reduce((s, i) => s + i.qty, 0);
+            if (totalCount > 0) {
+                badge.classList.remove('hidden');
+                badge.innerText = totalCount;
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+
+        function renderCartPage() {
+            // Ensure the cart page exists — we add it non-intrusively near other pages.
+            let cartPage = document.getElementById('cart-page');
+            if (!cartPage) {
+                // Create cart page section and append before footer
+                const section = document.createElement('div');
+                section.id = 'cart-page';
+                section.className = 'page-section hidden pt-24 pb-20 bg-white dark:bg-zinc-950 min-h-screen';
+                section.innerHTML = `
+                <div class="max-w-7xl mx-auto px-6">
+                    <h1 class="text-4xl font-bold mb-8 dark:text-white">Your Cart</h1>
+                    <div id="cart-list" class="space-y-4"></div>
+                    <div class="mt-8 border-t pt-6 flex justify-between items-center">
+                        <p id="cart-total" class="text-lg font-bold"></p>
+                        <div class="flex items-center space-x-3">
+                            <button id="clear-cart-btn" class="px-4 py-2 rounded-full border">Clear</button>
+                            <button id="checkout-btn" class="bg-green-600 hover:bg-green-500 text-white px-6 py-3 rounded-xl font-bold">Checkout on WhatsApp</button>
+                        </div>
+                    </div>
+                </div>`;
+                // insert before footer
+                const footer = document.querySelector('footer');
+                footer.parentNode.insertBefore(section, footer);
+                cartPage = document.getElementById('cart-page');
+
+                // bind clear & checkout after insertion
+                document.getElementById('clear-cart-btn').addEventListener('click', () => {
+                    cartItems = [];
+                    updateCartBadge();
+                    renderCartPage(); // re-render
+                });
+                document.getElementById('checkout-btn').addEventListener('click', () => checkoutCart());
+            }
+
+            const list = document.getElementById('cart-list');
+            list.innerHTML = '';
+            let total = 0;
+            cartItems.forEach((ci, idx) => {
+                const p = products.find(x => x.id === ci.id);
+                if (!p) return;
+                total += p.price * ci.qty;
+                const item = document.createElement('div');
+                item.className = 'flex items-center justify-between bg-zinc-50 dark:bg-zinc-900 p-4 rounded-lg';
+                item.innerHTML = `
+                    <div class="flex items-center space-x-4">
+                        <img src="${p.img}" class="w-20 h-20 object-cover rounded-md">
+                        <div>
+                            <div class="font-bold text-zinc-900 dark:text-white">${p.name}</div>
+                            <div class="text-sm text-zinc-500">${formatPrice(p.price)}</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <div class="flex items-center border rounded-full overflow-hidden">
+                            <button class="px-3 py-1" data-idx="${idx}" onclick="changeQty(${idx}, -1)">−</button>
+                            <div class="px-4 py-1">${ci.qty}</div>
+                            <button class="px-3 py-1" data-idx="${idx}" onclick="changeQty(${idx}, 1)">+</button>
+                        </div>
+                        <button class="text-red-500" onclick="removeCartItem(${idx})">Remove</button>
+                    </div>
+                `;
+                list.appendChild(item);
+            });
+            document.getElementById('cart-total').innerText = `Total: ${formatPrice(total)}`;
+        }
+
+        function changeQty(index, delta) {
+            if (!cartItems[index]) return;
+            cartItems[index].qty += delta;
+            if (cartItems[index].qty <= 0) {
+                cartItems.splice(index, 1);
+            }
+            updateCartBadge();
+            renderCartPage();
+        }
+
+        function removeCartItem(index) {
+            cartItems.splice(index, 1);
+            updateCartBadge();
+            renderCartPage();
+        }
+
+        function checkoutCart() {
+            const phone = "256773698573"; // Uganda
+            if (cartItems.length === 0) {
+                // If no items, fallback to open empty cart message
+                const msg = encodeURIComponent("Hello Cymoify Collectionz, I would like to enquire about products.");
+                window.open(`https://wa.me/${phone}?text=${msg}`, '_blank');
+                return;
+            }
+            const lines = cartItems.map(ci => {
+                const p = products.find(x => x.id === ci.id);
+                return `- ${p.name} x${ci.qty} (${formatPrice(p.price)})`;
+            }).join('%0A');
+            const total = cartItems.reduce((s, ci) => {
+                const p = products.find(x => x.id === ci.id);
+                return s + (p.price * ci.qty);
+            }, 0);
+            const message = `Hello Cymoify Collectionz,%0AI would like to order:%0A${lines}%0A%0ATotal: ${formatPrice(total)}`;
+            window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
+        }
+
+        // --- INIT ---
+        document.addEventListener('DOMContentLoaded', () => {
+            renderProducts();
+            renderTrending();
+            renderCategoryPages();
+            loadCartFromMemory();
+
+            // Check system dark mode
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.documentElement.classList.add('dark');
+                updateThemeIcon(true);
+            }
+        });
+
+        // --- RENDERING ---
+        
+        function formatPrice(price) {
+            return "UGX " + price.toLocaleString('en-UG');
+        }
+
+        // MODIFIED: Get product HTML — ADDED Add to Cart button under Buy Now
+        function getProductHTML(product) {
+            return `
+            <div class="group flex flex-col space-y-3 cursor-pointer animate-fade-in" onclick="openProduct(${product.id})">
+                <div class="relative aspect-[3/4] bg-zinc-100 dark:bg-zinc-800 overflow-hidden rounded-xl">
+                    <img src="${product.img}" alt="${product.name}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                    <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    
+                    <button class="absolute bottom-3 right-3 bg-white text-zinc-900 p-2.5 rounded-full shadow-lg translate-y-10 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 hover:bg-brand-600 hover:text-white" onclick="event.stopPropagation();">
+                        <iconify-icon icon="solar:cart-large-2-linear" width="20"></iconify-icon>
+                    </button>
+                    ${product.trending ? '<div class="absolute top-3 left-3 bg-brand-600 text-white px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">Hot</div>' : ''}
+                </div>
+                <div class="space-y-1 px-1">
+                    <div class="flex justify-between items-start">
+                        <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">${product.name}</h3>
+                        <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100 bg-zinc-100 dark:bg-zinc-800 px-2 py-1 rounded">${formatPrice(product.price)}</span>
+                    </div>
+                    <p class="text-xs text-zinc-500 capitalize">${product.category}</p>
+                </div>
+                
+                <a href="${getWhatsappLink(product)}" onclick="event.stopPropagation()" target="_blank" class="w-full bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider text-center hover:bg-brand-600 dark:hover:bg-brand-400 dark:hover:text-white transition-colors">
+                    Buy Now
+                </a>
+
+                <!-- ADDED: Add to Cart button -->
+                <button onclick="event.stopPropagation(); addToCart(${product.id}, 1)" class="w-full border border-zinc-200 dark:border-zinc-800 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider text-center hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors">
+                    Add to Cart
+                </button>
+            </div>
+            `;
+        }
+
+        function renderProducts() {
+            const grid = document.getElementById('product-grid');
+            grid.innerHTML = '';
+            
+            const filtered = currentFilter === 'all' 
+                ? products 
+                : products.filter(p => p.category === currentFilter);
+                
+            const toShow = filtered.slice(0, displayCount);
+            
+            toShow.forEach(p => {
+                grid.innerHTML += getProductHTML(p);
+            });
+
+            // Hide button if all shown
+            const btn = document.getElementById('load-more-btn');
+            if(displayCount >= filtered.length) {
+                btn.style.display = 'none';
+            } else {
+                btn.style.display = 'flex';
+            }
+        }
+
+        function renderTrending() {
+            const container = document.getElementById('trending-container');
+            container.innerHTML = '';
+            const trending = products.filter(p => p.trending);
+            
+            trending.forEach(p => {
+                container.innerHTML += `
+                <div class="flex-none w-64 snap-center cursor-pointer group" onclick="openProduct(${p.id})">
+                    <div class="relative aspect-[4/5] bg-zinc-100 dark:bg-zinc-800 rounded-xl overflow-hidden mb-3">
+                        <img src="${p.img}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                    </div>
+                    <h3 class="font-medium text-zinc-900 dark:text-white text-sm truncate">${p.name}</h3>
+                    <p class="text-xs text-brand-600 font-bold">${formatPrice(p.price)}</p>
+                </div>
+                `;
+            });
+        }
+
+        function renderCategoryPages() {
+            // Render specific grids for Men, Women, Accessories pages once
+            const cats = ['men', 'women', 'accessories'];
+            cats.forEach(cat => {
+                const el = document.getElementById(cat === 'accessories' ? 'acc-grid' : cat + '-grid');
+                if(!el) return;
+                const filtered = products.filter(p => p.category === cat);
+                filtered.forEach(p => el.innerHTML += getProductHTML(p));
+            });
+        }
+
+        // --- INTERACTIONS ---
+
+        function loadMoreProducts() {
+            displayCount += 8;
+            renderProducts();
+        }
+
+        function filterHome(cat) {
+            currentFilter = cat;
+            displayCount = 4; // Reset count
+            renderProducts();
+        }
+
+        function switchPage(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page-section').forEach(el => el.classList.add('hidden'));
+            
+            // Show selected
+            const target = pageId === 'home' ? 'home-page' : pageId + '-page';
+            // ADDED: if the cart page is called (new), handle it
+            if (pageId === 'cart') {
+                // ensure cart page exists and render
+                renderCartPage();
+                document.getElementById('cart-page').classList.remove('hidden');
+            } else {
+                const el = document.getElementById(target);
+                if (el) el.classList.remove('hidden');
+            }
+            
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+
+        function toggleTheme() {
+            const html = document.documentElement;
+            const isDark = html.classList.toggle('dark');
+            updateThemeIcon(isDark);
+        }
+
+        function updateThemeIcon(isDark) {
+            const icon = document.getElementById('theme-icon');
+            if (isDark) {
+                icon.setAttribute('icon', 'solar:sun-linear');
+            } else {
+                icon.setAttribute('icon', 'solar:moon-linear');
+            }
+        }
+
+        function toggleSearch() {
+            const overlay = document.getElementById('search-overlay');
+            const input = document.getElementById('search-input');
+            const isOpen = !overlay.classList.contains('hidden');
+            
+            if (isOpen) {
+                overlay.classList.remove('opacity-100');
+                setTimeout(() => overlay.classList.add('hidden'), 300);
+            } else {
+                overlay.classList.remove('hidden');
+                setTimeout(() => overlay.classList.add('opacity-100'), 10); // Trigger transition
+                input.value = '';
+                document.getElementById('search-results').innerHTML = '';
+                setTimeout(() => input.focus(), 100);
+            }
+        }
+
+        function handleSearch() {
+            const query = document.getElementById('search-input').value.toLowerCase();
+            const resultsDiv = document.getElementById('search-results');
+            resultsDiv.innerHTML = '';
+
+            if (query.length < 2) return;
+
+            const matches = products.filter(p => p.name.toLowerCase().includes(query) || p.category.includes(query));
+
+            if (matches.length === 0) {
+                resultsDiv.innerHTML = '<p class="text-zinc-500 col-span-2 text-center pt-10">No products found.</p>';
+                return;
+            }
+
+            matches.forEach(p => {
+                resultsDiv.innerHTML += `
+                <div class="flex items-center space-x-4 p-4 hover:bg-zinc-50 dark:hover:bg-zinc-900 rounded-lg cursor-pointer transition-colors" onclick="toggleSearch(); openProduct(${p.id})">
+                    <img src="${p.img}" class="w-16 h-16 rounded-md object-cover">
+                    <div>
+                        <h4 class="font-bold text-zinc-900 dark:text-white">${p.name}</h4>
+                        <p class="text-brand-600 font-medium">${formatPrice(p.price)}</p>
+                    </div>
+                </div>
+                `;
+            });
+        }
+
+        // --- MODAL & WHATSAPP ---
+
+        function openProduct(id) {
+            const product = products.find(p => p.id === id);
+            if (!product) return;
+
+            document.getElementById('modal-img').src = product.img;
+            document.getElementById('modal-title').innerText = product.name;
+            document.getElementById('modal-price').innerText = formatPrice(product.price);
+            document.getElementById('modal-category').innerText = product.category;
+            document.getElementById('modal-description').innerText = product.description || 'Expertly crafted for the modern individual in Uganda. This piece combines sustainable materials with a timeless silhouette.';
+            
+            // set modal add button product id
+            const modalAdd = document.getElementById('modal-add-btn');
+            modalAdd.setAttribute('data-product-id', product.id);
+
+            const btn = document.getElementById('modal-whatsapp-btn');
+            btn.href = getWhatsappLink(product);
+
+            const modal = document.getElementById('product-modal');
+            modal.classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('product-modal').classList.add('hidden');
+        }
+
+        // ORIGINAL single-product WhatsApp link (unchanged)
+        function getWhatsappLink(product) {
+            const phone = "256773698573"; // Changed prefix to Uganda (256) based on request
+            const text = `Hi, I am interested in ordering the ${product.name} (Price: ${formatPrice(product.price)}) from Cymoify Collectionz.`;
+            return `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
+        }
+
+        // --- CART UTILS (ensure compatibility with existing 'Buy Now' behavior) ---
+
+        // Ensure Add to Cart buttons added to grid increment cart and update badge
+        // (functions defined above)
+
+        // --- UTILS ---
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            const isOpen = !menu.classList.contains('-translate-x-full');
+            menu.classList.toggle('-translate-x-full');
+        }
+
+        function scrollToGrid() {
+            document.getElementById('shop-grid').scrollIntoView();
+        }
+
+        function scrollTrending(direction) {
+            const container = document.getElementById('trending-container');
+            const scrollAmount = 300;
+            if (direction === 'left') {
+                container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+            } else {
+                container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+            }
+        }
+
+        // HERO fade on scroll (ADDED)
+        window.addEventListener('scroll', () => {
+            const img = document.getElementById('hero-bg');
+            const grad = document.getElementById('hero-gradient');
+            const opacity = Math.max(0, 1 - window.scrollY / 500);
+            if (img) img.style.opacity = opacity;
+            if (grad) grad.style.opacity = Math.max(0.25, opacity); // keep some overlay for legibility
+        });
+    </script>
+
+</body></html>
